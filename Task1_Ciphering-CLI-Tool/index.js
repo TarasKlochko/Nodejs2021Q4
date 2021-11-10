@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { access, constants } from 'fs';
 import path, { dirname } from 'path';
+import { pipeline } from 'stream';
 import { fileURLToPath } from 'url';
 
 const filename = fileURLToPath(import.meta.url);
@@ -99,6 +100,13 @@ outputValueValidation(optionsValue.outputValue);
 console.log('Correct', configValueValidation(optionsValue.configValue));
 console.log(optionsValue);
 
-// const input = fs.createReadStream('input.txt', 'utf-8');
-// const output = fs.createWriteStream('output.txt');
-// input.on('data', (chunk) => console.log(chunk));
+const input = optionsValue.inputValue ? fs.createReadStream(optionsValue.inputValue, 'utf-8') : process.stdin;
+const output = optionsValue.outputValue
+  ? fs.createWriteStream(optionsValue.outputValue, { flags: 'a' })
+  : process.stdout;
+
+pipeline(input, output, (err) => {
+  if (err) {
+    console.log('Error', err);
+  }
+});
