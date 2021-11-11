@@ -20,8 +20,12 @@ function checkDoubleKey() {
   for (const key in optionsKeyShortAmount) {
     if (optionsKeyShortAmount[key] > 1) isDouble = true;
   }
-  console.log(isDouble);
-  // return isDouble
+  console.log('isDouble', isDouble);
+
+  if (isDouble) {
+    process.stderr.write('Please delete double option!');
+    process.exit(1);
+  }
 }
 
 checkDoubleKey();
@@ -33,6 +37,14 @@ function classifyOptionsKey(short, full) {
   return option ? option : null;
 }
 
+const classifiedOptions = {
+  config: classifyOptionsKey('-c', '--config'),
+  input: classifyOptionsKey('-i', '--input'),
+  output: classifyOptionsKey('-o', '--output'),
+};
+
+console.log(classifiedOptions);
+
 function getOptionsValue(flag) {
   const flagIndex = process.argv.indexOf(flag);
   const optionValue = flagIndex !== -1 ? process.argv[flagIndex + 1] : null;
@@ -41,14 +53,6 @@ function getOptionsValue(flag) {
   }
   return null;
 }
-
-const classifiedOptions = {
-  config: classifyOptionsKey('-c', '--config'),
-  input: classifyOptionsKey('-i', '--input'),
-  output: classifyOptionsKey('-o', '--output'),
-};
-
-console.log(classifiedOptions);
 
 export const optionsValue = {
   configValue: getOptionsValue(classifiedOptions.config),
@@ -60,21 +64,38 @@ console.log('optionsValue', optionsValue);
 
 function configValueValidation(configValue) {
   if (configValue) {
-    return configValue.split('-').every((config) => /(^[C|R][0|1]$)|(^[A]$)/.test(config));
+    const isCorrectConfigValue = configValue.split('-').every((config) => /(^[C|R][0|1]$)|(^[A]$)/.test(config));
+    if (!isCorrectConfigValue) {
+      process.stderr.write('Please write correct config value!');
+      process.exit(1);
+    }
   }
-  return false;
+  if (!configValue) {
+    process.stderr.write('Please write config option!');
+    process.exit(1);
+  }
 }
+
+configValueValidation(optionsValue.configValue);
 
 function inputValueValidation(file) {
   if (file) {
     access(path.join(__dirname, file), constants.F_OK, (err) => {
-      console.log(`${file} ${err ? 'does not exist' : 'exists'}`);
+      if (err) {
+        process.stderr.write(`File "${file}" does not exist.\nPlease write correct input value!`);
+        process.exit(1);
+      }
     });
     access(path.join(__dirname, file), constants.R_OK, (err) => {
-      console.log(`${file} ${err ? 'is not readable' : 'is readable'}`);
+      if (err) {
+        process.stderr.write(`File "${file}" is not readable.\nPlease write correct input value!`);
+        process.exit(1);
+      }
     });
-  } else {
-    console.log('Input option is empty');
+  }
+  if (classifiedOptions.input && !file) {
+    process.stderr.write('Input option is empty.\nPlease write correct input value!');
+    process.exit(1);
   }
 }
 
@@ -84,13 +105,18 @@ function outputValueValidation(file) {
   if (file) {
     access(path.join(__dirname, file), constants.F_OK | constants.W_OK, (err) => {
       if (err) {
-        console.error(`${file} ${err.code === 'ENOENT' ? 'does not exist' : 'is read-only'}`);
-      } else {
-        console.log(`${file} exists, and it is writable`);
+        process.stderr.write(
+          `File "${file}" ${
+            err.code === 'ENOENT' ? 'does not exist' : 'is read-only'
+          }.\nPlease write correct output value!`
+        );
+        process.exit(1);
       }
     });
-  } else {
-    console.log('Output option is empty');
+  }
+  if (classifiedOptions.output && !file) {
+    process.stderr.write('Output option is empty.\nPlease write correct output value!');
+    process.exit(1);
   }
 }
 
