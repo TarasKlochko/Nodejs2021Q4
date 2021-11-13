@@ -15,13 +15,10 @@ const optionsKey = getOptionsKey();
 function checkDoubleKey() {
   const optionsKeyShort = optionsKey.map((key) => (/^[-]{2}/.test(key) ? (key = key.slice(1, 3)) : key));
   let optionsKeyShortAmount = optionsKeyShort.reduce((acc, key) => ((acc[key] = 1 + (acc[key] || 0)), acc), {});
-  console.log('optionsKeyShortAmount', optionsKeyShortAmount);
   let isDouble = false;
   for (const key in optionsKeyShortAmount) {
     if (optionsKeyShortAmount[key] > 1) isDouble = true;
   }
-  console.log('isDouble', isDouble);
-
   if (isDouble) {
     process.stderr.write('Please delete double option!');
     process.exit(1);
@@ -29,8 +26,6 @@ function checkDoubleKey() {
 }
 
 checkDoubleKey();
-
-console.log(optionsKey);
 
 function classifyOptionsKey(short, full) {
   let option = optionsKey.filter((key) => key === short || key === full).toString();
@@ -42,8 +37,6 @@ const classifiedOptions = {
   input: classifyOptionsKey('-i', '--input'),
   output: classifyOptionsKey('-o', '--output'),
 };
-
-console.log(classifiedOptions);
 
 function getOptionsValue(flag) {
   const flagIndex = process.argv.indexOf(flag);
@@ -59,8 +52,6 @@ export const optionsValue = {
   inputValue: getOptionsValue(classifiedOptions.input),
   outputValue: getOptionsValue(classifiedOptions.output),
 };
-
-console.log('optionsValue', optionsValue);
 
 function configValueValidation(configValue) {
   if (configValue) {
@@ -121,6 +112,3 @@ function outputValueValidation(file) {
 }
 
 outputValueValidation(optionsValue.outputValue);
-
-console.log('Correct', configValueValidation(optionsValue.configValue));
-console.log(optionsValue);
