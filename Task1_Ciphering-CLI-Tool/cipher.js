@@ -44,9 +44,7 @@ function getNewChar(char, shift, encrypt, atbash) {
   return char;
 }
 
-function cipher(input, shift, encrypt, atbash = 0) {
+export function cipher(input, shift, encrypt, atbash = 0) {
   let newInput = input.split('').map((char) => getNewChar(char, shift, encrypt, atbash));
   return newInput.join('');
 }
-
-cipher('MNmn', 0, 0, 1);
