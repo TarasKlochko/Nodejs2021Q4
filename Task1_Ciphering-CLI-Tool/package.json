@@ -1,0 +1,9 @@
+{
+  "name": "task1_ciphering-cli-tool",
+  "version": "1.0.0",
+  "description": " CLI tool that encode and decode a text by 3 substitution ciphers: Caesar cipher, Atbash cipher and ROT-8 as variation of ROT-13",
+  "main": "index.js",
+  "type": "module",
+  "author": "Taras Klochko",
+  "license": "ISC"
+}
