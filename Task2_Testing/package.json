@@ -5,5 +5,11 @@
   "main": "index.js",
   "type": "module",
   "author": "Taras Klochko",
-  "license": "ISC"
+  "scripts": {
+    "test": "jest"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.3.1"
+  }
 }
