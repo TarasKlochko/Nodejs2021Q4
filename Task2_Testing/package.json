@@ -1,0 +1,9 @@
+{
+  "name": "task2_testing",
+  "version": "1.0.0",
+  "description": "Tests for Ciphering machine CLI from 1st task.",
+  "main": "index.js",
+  "type": "module",
+  "author": "Taras Klochko",
+  "license": "ISC"
+}
