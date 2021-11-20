@@ -1,6 +1,5 @@
 import { access, constants } from 'fs';
 import path, { dirname } from 'path';
-
 import { fileURLToPath } from 'url';
 
 const filename = fileURLToPath(import.meta.url);
@@ -10,9 +9,7 @@ function getOptionsKey() {
   return process.argv.filter((value) => /(^[-]{2}config|input|output)$|(^[-][c|i|o]$)/.test(value));
 }
 
-const optionsKey = getOptionsKey();
-
-function checkDoubleKey() {
+function checkDoubleKey(optionsKey) {
   const optionsKeyShort = optionsKey.map((key) => (/^[-]{2}/.test(key) ? (key = key.slice(1, 3)) : key));
   let optionsKeyShortAmount = optionsKeyShort.reduce((acc, key) => ((acc[key] = 1 + (acc[key] || 0)), acc), {});
   let isDouble = false;
@@ -25,18 +22,10 @@ function checkDoubleKey() {
   }
 }
 
-checkDoubleKey();
-
-function classifyOptionsKey(short, full) {
+function classifyOptionsKey(short, full, optionsKey) {
   let option = optionsKey.filter((key) => key === short || key === full).toString();
   return option ? option : null;
 }
-
-const classifiedOptions = {
-  config: classifyOptionsKey('-c', '--config'),
-  input: classifyOptionsKey('-i', '--input'),
-  output: classifyOptionsKey('-o', '--output'),
-};
 
 function getOptionsValue(flag) {
   const flagIndex = process.argv.indexOf(flag);
@@ -46,12 +35,6 @@ function getOptionsValue(flag) {
   }
   return null;
 }
-
-export const optionsValue = {
-  configValue: getOptionsValue(classifiedOptions.config),
-  inputValue: getOptionsValue(classifiedOptions.input),
-  outputValue: getOptionsValue(classifiedOptions.output),
-};
 
 function configValueValidation(configValue) {
   if (configValue) {
@@ -67,9 +50,7 @@ function configValueValidation(configValue) {
   }
 }
 
-configValueValidation(optionsValue.configValue);
-
-function inputValueValidation(file) {
+function inputValueValidation(file, classifiedOptions) {
   if (file) {
     access(path.join(__dirname, file), constants.F_OK, (err) => {
       if (err) {
@@ -90,9 +71,7 @@ function inputValueValidation(file) {
   }
 }
 
-inputValueValidation(optionsValue.inputValue);
-
-function outputValueValidation(file) {
+function outputValueValidation(file, classifiedOptions) {
   if (file) {
     access(path.join(__dirname, file), constants.F_OK | constants.W_OK, (err) => {
       if (err) {
@@ -111,4 +90,27 @@ function outputValueValidation(file) {
   }
 }
 
-outputValueValidation(optionsValue.outputValue);
+function getOptions(optionsKey) {
+  checkDoubleKey(optionsKey);
+  const classifiedOptions = {
+    config: classifyOptionsKey('-c', '--config', optionsKey),
+    input: classifyOptionsKey('-i', '--input', optionsKey),
+    output: classifyOptionsKey('-o', '--output', optionsKey),
+  };
+  const optionsValue = {
+    configValue: getOptionsValue(classifiedOptions.config),
+    inputValue: getOptionsValue(classifiedOptions.input),
+    outputValue: getOptionsValue(classifiedOptions.output),
+  };
+  configValueValidation(optionsValue.configValue);
+  inputValueValidation(optionsValue.inputValue, classifiedOptions);
+  outputValueValidation(optionsValue.outputValue, classifiedOptions);
+  return optionsValue;
+}
+
+const optionsKey = getOptionsKey();
+
+export const options = getOptions(optionsKey);
+export const exportedForTesting = {
+  getOptions,
+};
