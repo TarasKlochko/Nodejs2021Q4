@@ -1,0 +1,16 @@
+{
+  "name": "task2_testing",
+  "version": "1.0.0",
+  "description": "Tests for Ciphering machine CLI from 1st task.",
+  "main": "index.js",
+  "type": "module",
+  "author": "Taras Klochko",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --verbose"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "jest": "^27.3.1"
+  }
+}
