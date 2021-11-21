@@ -1,6 +1,6 @@
 import { Transform } from 'stream';
 import { cipher } from './cipher.js';
-import { options } from './options.js';
+import { getOptions } from './options.js';
 
 export let transforms = [];
 
@@ -14,15 +14,17 @@ function createTransformStream(shift, encrypt, atbash = 0) {
   transforms.push(transform);
 }
 
-options.configValue.split('-').forEach((config) => {
-  let [cipherType, value] = config.split('');
-  if (cipherType === 'C') {
-    createTransformStream(1, +value, 0);
-  }
-  if (cipherType === 'R') {
-    createTransformStream(8, +value, 0);
-  }
-  if (cipherType === 'A') {
-    createTransformStream(null, null, 1);
-  }
-});
+getOptions()
+  .configValue.split('-')
+  .forEach((config) => {
+    let [cipherType, value] = config.split('');
+    if (cipherType === 'C') {
+      createTransformStream(1, +value, 0);
+    }
+    if (cipherType === 'R') {
+      createTransformStream(8, +value, 0);
+    }
+    if (cipherType === 'A') {
+      createTransformStream(null, null, 1);
+    }
+  });

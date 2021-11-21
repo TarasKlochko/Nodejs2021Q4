@@ -1,4 +1,4 @@
 import fs from 'fs';
-import { options } from './options.js';
+import { getOptions } from './options.js';
 
-export const input = options.inputValue ? fs.createReadStream(options.inputValue, 'utf-8') : process.stdin;
+export const input = getOptions().inputValue ? fs.createReadStream(getOptions().inputValue, 'utf-8') : process.stdin;

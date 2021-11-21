@@ -4,9 +4,10 @@ import { fileURLToPath } from 'url';
 
 const filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(filename);
+const argsInput = process.argv;
 
-function getOptionsKey() {
-  return process.argv.filter((value) => /(^[-]{2}config|input|output)$|(^[-][c|i|o]$)/.test(value));
+function getOptionsKey(argsInput) {
+  return argsInput.filter((value) => /(^[-]{2}config|input|output)$|(^[-][c|i|o]$)/.test(value));
 }
 
 function checkDoubleKey(optionsKey) {
@@ -27,9 +28,9 @@ function classifyOptionsKey(short, full, optionsKey) {
   return option ? option : null;
 }
 
-function getOptionsValue(flag) {
-  const flagIndex = process.argv.indexOf(flag);
-  const optionValue = flagIndex !== -1 ? process.argv[flagIndex + 1] : null;
+function getOptionsValue(flag, argsInput) {
+  const flagIndex = argsInput.indexOf(flag);
+  const optionValue = flagIndex !== -1 ? argsInput[flagIndex + 1] : null;
   if (optionValue) {
     return optionValue[0] !== '-' ? optionValue : null;
   }
@@ -90,7 +91,8 @@ function outputValueValidation(file, classifiedOptions) {
   }
 }
 
-function getOptions(optionsKey) {
+export function getOptions(argsInputs = argsInput) {
+  const optionsKey = getOptionsKey(argsInputs);
   checkDoubleKey(optionsKey);
   const classifiedOptions = {
     config: classifyOptionsKey('-c', '--config', optionsKey),
@@ -98,19 +100,12 @@ function getOptions(optionsKey) {
     output: classifyOptionsKey('-o', '--output', optionsKey),
   };
   const optionsValue = {
-    configValue: getOptionsValue(classifiedOptions.config),
-    inputValue: getOptionsValue(classifiedOptions.input),
-    outputValue: getOptionsValue(classifiedOptions.output),
+    configValue: getOptionsValue(classifiedOptions.config, argsInputs),
+    inputValue: getOptionsValue(classifiedOptions.input, argsInputs),
+    outputValue: getOptionsValue(classifiedOptions.output, argsInputs),
   };
   configValueValidation(optionsValue.configValue);
   inputValueValidation(optionsValue.inputValue, classifiedOptions);
   outputValueValidation(optionsValue.outputValue, classifiedOptions);
   return optionsValue;
 }
-
-const optionsKey = getOptionsKey();
-
-export const options = getOptions(optionsKey);
-export const exportedForTesting = {
-  getOptions,
-};

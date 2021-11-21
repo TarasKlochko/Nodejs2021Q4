@@ -1,4 +1,6 @@
 import fs from 'fs';
-import { options } from './options.js';
+import { getOptions } from './options.js';
 
-export const output = options.outputValue ? fs.createWriteStream(options.outputValue, { flags: 'a' }) : process.stdout;
+export const output = getOptions().outputValue
+  ? fs.createWriteStream(getOptions().outputValue, { flags: 'a' })
+  : process.stdout;
